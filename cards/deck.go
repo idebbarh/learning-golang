@@ -2,10 +2,16 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
+	"strings"
 )
 
 type deck []string
+
+func (d deck) toString() string {
+	return strings.Join(d, ",")
+}
 
 func newDeck() deck {
 	suits := []string{"Hearts", "Diamonds", "Clubs", "Spades"}
@@ -32,29 +38,39 @@ func deal(d deck, hand int) (deck, deck) {
 	return first, rest
 }
 
-func (d deck) createDeckFile() {
-	filePath := "./deck.txt"
+func (d deck) saveToFile(filename string) error {
+	deckString := d.toString()
 
-	deckFile, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		return
-	}
+	return os.WriteFile(filename, []byte(deckString), 6642)
+}
 
-	defer deckFile.Close()
+func getFromFile(filename string) (deck, error) {
+	data, err := os.ReadFile(filename)
 
-	for _, l := range d {
-		_, err = fmt.Fprintf(deckFile, l)
+	return strings.Split(string(data), ","), err
+}
 
-		if err != nil {
-			return
-		}
+func getNotEmptyIndex(d deck) []int {
+	indexes := []int{}
 
-		_, err = fmt.Fprintf(deckFile, "\n")
-
-		if err != nil {
-			return
+	for i, v := range d {
+		if v != "nil" {
+			indexes = append(indexes, i)
 		}
 	}
+	return indexes
+}
 
-	fmt.Println("file create with data")
+func (d deck) shuffle() deck {
+	indexes := getNotEmptyIndex(d)
+	newDeck := deck{}
+
+	for len(indexes) > 0 {
+		ranIndexesIndex := rand.Intn(len(indexes))
+		ranDeckIndex := indexes[ranIndexesIndex]
+		newDeck = append(newDeck, d[ranDeckIndex])
+		d[ranDeckIndex] = "nil"
+		indexes = getNotEmptyIndex(d)
+	}
+	return newDeck
 }
