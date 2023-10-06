@@ -50,27 +50,11 @@ func getFromFile(filename string) (deck, error) {
 	return strings.Split(string(data), ","), err
 }
 
-func getNotEmptyIndex(d deck) []int {
-	indexes := []int{}
-
+func (d deck) shuffle() {
 	for i, v := range d {
-		if v != "nil" {
-			indexes = append(indexes, i)
-		}
+		randomIndx := rand.Intn(len(d))
+		tmp := d[randomIndx]
+		d[randomIndx] = v
+		d[i] = tmp
 	}
-	return indexes
-}
-
-func (d deck) shuffle() deck {
-	indexes := getNotEmptyIndex(d)
-	newDeck := deck{}
-
-	for len(indexes) > 0 {
-		ranIndexesIndex := rand.Intn(len(indexes))
-		ranDeckIndex := indexes[ranIndexesIndex]
-		newDeck = append(newDeck, d[ranDeckIndex])
-		d[ranDeckIndex] = "nil"
-		indexes = getNotEmptyIndex(d)
-	}
-	return newDeck
 }
