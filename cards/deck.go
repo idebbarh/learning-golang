@@ -9,6 +9,18 @@ import (
 
 type deck []string
 
+func deckEqual(a, b deck) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range b {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func (d deck) toString() string {
 	return strings.Join(d, ",")
 }
@@ -51,10 +63,7 @@ func getFromFile(filename string) (deck, error) {
 }
 
 func (d deck) shuffle() {
-	for i, v := range d {
-		randomIndx := rand.Intn(len(d))
-		tmp := d[randomIndx]
-		d[randomIndx] = v
-		d[i] = tmp
-	}
+	rand.Shuffle(len(d), func(i int, j int) {
+		d[i], d[j] = d[j], d[i]
+	})
 }
