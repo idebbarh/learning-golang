@@ -42,7 +42,7 @@ func TestSaveToFileAndGetFromFile(t *testing.T) {
 		t.Errorf("error on get from file function")
 	}
 
-	if reflect.TypeOf(fileDeck) == reflect.TypeOf(newDeck) {
+	if reflect.TypeOf(fileDeck) != reflect.TypeOf(newDeck) {
 		t.Errorf("expected getFromFile function to return type of %v but got type of %v", reflect.TypeOf(newDeck), reflect.TypeOf(fileDeck))
 	} else if !deckEqual(newDeck, fileDeck) {
 		t.Errorf("create deck and the deck from the file are not equal")
@@ -52,5 +52,22 @@ func TestSaveToFileAndGetFromFile(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("Error removing temporary file: %v", err)
+	}
+}
+
+func TestShuffle(t *testing.T) {
+	deckToShuffle := newDeck()
+	deckToCompare := newDeck()
+
+	deckToShuffle.shuffle()
+
+	for i := range deckToShuffle {
+		if deckToShuffle[i] != deckToCompare[i] {
+			break
+		}
+
+		if i == len(deckToShuffle)-1 {
+			t.Errorf("expected different deck after shuffle but got the same")
+		}
 	}
 }
