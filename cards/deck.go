@@ -7,7 +7,12 @@ import (
 	"strings"
 )
 
-type deck []string
+type card struct {
+	suit string
+	rank string
+}
+
+type deck []card
 
 func deckEqual(a, b deck) bool {
 	if len(a) != len(b) {
@@ -22,16 +27,38 @@ func deckEqual(a, b deck) bool {
 }
 
 func (d deck) toString() string {
-	return strings.Join(d, ",")
+	joindedCards := ""
+	for i, card := range d {
+		fullCardName := card.rank + " of " + card.suit
+		if i == 0 {
+			joindedCards += fullCardName
+		} else {
+			joindedCards += "," + fullCardName
+		}
+	}
+	return joindedCards
+}
+
+func toDeck(s string) deck {
+	stringCards := strings.Split(s, ",")
+	cardsDeck := deck{}
+
+	for _, sc := range stringCards {
+		sliceCard := strings.Split(sc, " of ")
+		card := card{sliceCard[0], sliceCard[1]}
+		cardsDeck = append(cardsDeck, card)
+	}
+	return cardsDeck
 }
 
 func newDeck() deck {
 	suits := []string{"Hearts", "Diamonds", "Clubs", "Spades"}
 	ranks := []string{"2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"}
-	deckNames := []string{}
+	deckNames := deck{}
 	for _, s := range suits {
 		for _, r := range ranks {
-			deckNames = append(deckNames, r+" of "+s)
+			card := card{s, r}
+			deckNames = append(deckNames, card)
 		}
 	}
 	return deckNames
@@ -39,7 +66,7 @@ func newDeck() deck {
 
 func (d deck) print() {
 	for _, deck := range d {
-		fmt.Println(deck)
+		fmt.Println(deck.suit + " of " + deck.rank)
 	}
 }
 
@@ -59,7 +86,7 @@ func (d deck) saveToFile(filename string) error {
 func getFromFile(filename string) (deck, error) {
 	data, err := os.ReadFile(filename)
 
-	return strings.Split(string(data), ","), err
+	return toDeck(string(data)), err
 }
 
 func (d deck) shuffle() {
